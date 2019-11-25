@@ -85,19 +85,21 @@ jobs:
             ./scripts/docker-run.sh checker make check-version
 
   test-x86_64-pc-windows-msvc:
+    machine:
+      image: "windows-server-2019-vs2019:stable"
+      resource_class: windows.xlarge
+      shell: bash
     executor: win/vs2019
     steps:
       - checkout
       - run:
           name: Install Rust
-          shell: bash
           command: |
             curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly-2019-11-19
             # see https://github.com/rust-lang/cargo/issues/2078
             printf '[net]\ngit-fetch-with-cli = true\n' > "$HOME/.cargo/config"
       - run:
           name: Download Perl
-          shell: bash
           command: |
             VERSION=5.30.0.1
             # we need to verify checksum because strawberryperl.com doesn't support HTTPS
@@ -112,7 +114,6 @@ jobs:
             del perl-installer.msi
       - run:
           name: Download CMake
-          shell: bash
           command: |
             VERSION=3.15.5
             curl -sSfL https://github.com/Kitware/CMake/releases/download/v$VERSION/cmake-$VERSION-win64-x64.msi > cmake-installer.msi
@@ -124,7 +125,6 @@ jobs:
             del cmake-installer.msi
       - run:
           name: Build and test
-          shell: bash
           command: |
             RUSTFLAGS=-Ctarget-feature=+crt-static
             PATH="$HOME/.cargo/bin:/c/Strawberry/perl/bin:/c/Program Files/CMake/bin:$PATH"
@@ -212,19 +212,20 @@ jobs:
             - "*-x86_64-apple-darwin.tar.gz"
 
   build-x86_64-pc-windows-msvc-archive:
-    executor: win/vs2019
+    machine:
+      image: "windows-server-2019-vs2019:windows-server-2019-vs2019"
+      resource_class: windows.xlarge
+      shell: bash
     steps:
       - checkout
       - run:
           name: Install Rust
-          shell: bash
           command: |
             curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly-2019-11-19
             # see https://github.com/rust-lang/cargo/issues/2078
             printf '[net]\ngit-fetch-with-cli = true\n' > "$HOME/.cargo/config"
       - run:
           name: Download Perl
-          shell: bash
           command: |
             VERSION=5.30.0.1
             # we need to verify checksum because strawberryperl.com doesn't support HTTPS
@@ -239,7 +240,6 @@ jobs:
             del perl-installer.msi
       - run:
           name: Download CMake
-          shell: bash
           command: |
             VERSION=3.15.5
             curl -sSfL https://github.com/Kitware/CMake/releases/download/v$VERSION/cmake-$VERSION-win64-x64.msi > cmake-installer.msi
@@ -251,7 +251,6 @@ jobs:
             del cmake-installer.msi
       - run:
           name: Build archive
-          shell: bash
           command: |
             export PATH="$HOME/.cargo/bin:/c/Strawberry/perl/bin:/c/Program Files/CMake/bin:$PATH"
             function zip() {
